@@ -1,5 +1,5 @@
-from starlette._utils import get_route_path
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, status
+from app.services import user_service
 
 router = APIRouter(
             prefix="/users",
@@ -8,10 +8,15 @@ router = APIRouter(
 
 @router.get('/')
 async def get_users():
-    return {"message": "Users route working"}
+    users = await user_service.get_all_users()
+    return users
 
 @router.get("/{user_id}")
-async def getspecuser(user_id: int):
-    return {
-        "user_id": user_id
-    }
+async def get_spec_user(user_id: int):
+    try:
+        return await user_service.get_spec_user(user_id)
+    except user_service.UserNotFoundError:
+        raise HTTPException(
+            status_code = 404,
+            detail = "User not found"
+        )
