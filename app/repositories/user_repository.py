@@ -1,16 +1,12 @@
-users = [
-    {"id": 1, "name": "akash"},
-    {"id": 2, "name": "rahul"},
-    {"id": 3, "name": "ashita"}
-]
+from sqlalchemy import select
+from app.models.user import User
 
-async def get_all():
-    return users
+def get_all(db):
+    stmt = select(User)
+    return db.scalars(stmt).all()
 
-async def get_user(user_id: int):
-    for user in users:
-        if user["id"] == user_id:
-           return user
-    return None
+def get_user(user_id: int, db):
+    stmt = select(User).where(User.id == user_id)
+    return db.scalars(stmt).first()
 
 # print(get_user(3))
