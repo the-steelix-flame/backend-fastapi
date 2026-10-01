@@ -3,11 +3,15 @@ class UserNotFoundError(Exception):
     pass
 
 async def get_all_users(db):
-    users = await user_repository.get_all(db)
+    users = user_repository.get_all(db)
     return users
 
-async def get_spec_user(user_id:int, db):
-    user = await user_repository.get_user(user_id, db)
+async def get_spec_user(db, user_id:int):
+    user = user_repository.get_user(db, user_id)
     if user is None:
         raise UserNotFoundError("User Not found")
     return user
+
+async def create_user(db, user):
+    new_user = user_repository.create_user(db, user)
+    return new_user

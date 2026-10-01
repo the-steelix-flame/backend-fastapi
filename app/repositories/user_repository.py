@@ -5,8 +5,13 @@ def get_all(db):
     stmt = select(User)
     return db.scalars(stmt).all()
 
-def get_user(user_id: int, db):
+def get_user(db, user_id: int):
     stmt = select(User).where(User.id == user_id)
     return db.scalars(stmt).first()
 
-# print(get_user(3))
+def create_user(db, user):
+    new_user = User(**user.dict())
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
