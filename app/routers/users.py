@@ -1,8 +1,7 @@
-from pydantic import BaseModel
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends
 from app.services import user_service
 from app.dependencies import get_db
-from app.schemas.user import UserCreate, UserResponse
+from app.schemas.user import UserCreate, UserResponse, UserUpdate
 
 router = APIRouter(
             prefix="/users",
@@ -35,3 +34,38 @@ async def create_spec_user(user:UserCreate, db = Depends(get_db)):
             status_code=409,
         detail="User with this email already exists"
     )
+
+
+@router.put("/{user_id}", response_model=UserResponse)
+async def update_user(
+    user_id: int,
+    user: UserUpdate,
+    db=Depends(get_db)
+):
+    try:
+        return await user_service.update_user(db, user_id, user)
+
+    except user_service.UserNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    except user_service.UserAlreadyExistsError:
+        raise HTTPException(
+            status_code=409,
+            detail="User with this email already exists"
+        )
+
+@router.delete(
+    "/{user_id}",
+    status_code=204
+)
+async def delete_user(user_id: int, db = Depends(get_db)):
+    try:
+        return await user_service.delete_user(db, user_id)
+    except user_service.UserNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )

@@ -11,3 +11,8 @@ class UserResponse(BaseModel):
     email:str
 
     model_config= ConfigDict(from_attributes=True)
+
+
+class UserUpdate(BaseModel):
+    name: str
+    email: str
