@@ -55,4 +55,3 @@ def delete_user(db, user_id):
 
     db.delete(user)
     db.commit()
-    return True

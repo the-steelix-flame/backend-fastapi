@@ -57,13 +57,10 @@ async def update_user(
             detail="User with this email already exists"
         )
 
-@router.delete(
-    "/{user_id}",
-    status_code=204
-)
-async def delete_user(user_id: int, db = Depends(get_db)):
+@router.delete("/{user_id}", status_code=204)
+async def delete_user(user_id: int, db=Depends(get_db)):
     try:
-        return await user_service.delete_user(db, user_id)
+        await user_service.delete_user(db, user_id)
     except user_service.UserNotFoundError:
         raise HTTPException(
             status_code=404,
