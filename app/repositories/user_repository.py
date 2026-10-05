@@ -1,5 +1,9 @@
 from sqlalchemy import select
 from app.models.user import User
+from sqlalchemy.exc import IntegrityError
+
+class DuplicateEmailError(Exception):
+    pass
 
 def get_all(db):
     stmt = select(User)
@@ -12,6 +16,10 @@ def get_user(db, user_id: int):
 def create_user(db, user):
     new_user = User(**user.model_dump())
     db.add(new_user)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise DuplicateEmailError()
     db.refresh(new_user)
     return new_user

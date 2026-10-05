@@ -1,6 +1,11 @@
 from app.repositories import user_repository
+
+class UserAlreadyExistsError(Exception):
+    pass
 class UserNotFoundError(Exception):
     pass
+
+
 
 async def get_all_users(db):
     users = user_repository.get_all(db)
@@ -13,5 +18,8 @@ async def get_spec_user(db, user_id:int):
     return user
 
 async def create_user(db, user):
-    new_user = user_repository.create_user(db, user)
-    return new_user
+    try:
+        return user_repository.create_user(db, user)
+
+    except user_repository.DuplicateEmailError:
+        raise UserAlreadyExistsError()

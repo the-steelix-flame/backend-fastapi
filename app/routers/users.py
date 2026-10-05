@@ -27,5 +27,11 @@ async def get_spec_user(user_id: int, db = Depends(get_db)):
 
 @router.post('/', status_code=201, response_model=UserResponse)
 async def create_spec_user(user:UserCreate, db = Depends(get_db)):
-    new_user = await user_service.create_user(db, user)
-    return new_user
+    try:
+        return await user_service.create_user(db, user)
+
+    except user_service.UserAlreadyExistsError:
+        raise HTTPException(
+            status_code=409,
+        detail="User with this email already exists"
+    )
