@@ -10,7 +10,7 @@ def get_user(db, user_id: int):
     return db.scalars(stmt).first()
 
 def create_user(db, user):
-    new_user = User(**user.dict())
+    new_user = User(**user.model_dump())
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
