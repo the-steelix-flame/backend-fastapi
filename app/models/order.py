@@ -6,8 +6,24 @@ class Order(Base):
     __tablename__ = "orders"
 
     id = Column(Integer, primary_key=True)
-    product = Column(String)
-    amount = Column(Integer)
-    user_id = Column(Integer, ForeignKey("users.id"))
 
-    user = relationship("User", back_populates="orders")
+    product = Column(
+        String,
+        nullable=False
+    )
+
+    amount = Column(
+        Integer,
+        nullable=False
+    )
+
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=False
+    )
+
+    user = relationship(
+        "User",
+        back_populates="orders"
+    )

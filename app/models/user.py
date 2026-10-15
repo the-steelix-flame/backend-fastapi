@@ -10,4 +10,4 @@ class User(Base):
     email = Column(String, unique=True, nullable=False)
     age = Column(Integer, nullable=True)
 
-    orders = relationship("Order", back_populates="users")
+    orders = relationship("Order", back_populates="user")
