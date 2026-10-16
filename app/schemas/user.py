@@ -1,8 +1,9 @@
 from pydantic import BaseModel, ConfigDict
 
-class UserCreate(BaseModel):
-    name:str
-    email:str
+class UserRegister(BaseModel):
+    name: str
+    email: str
+    password: str
 
 
 class UserResponse(BaseModel):

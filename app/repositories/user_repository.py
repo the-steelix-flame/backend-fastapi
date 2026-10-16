@@ -16,8 +16,12 @@ def get_user(db, user_id: int):
     stmt = select(User).where(User.id == user_id)
     return db.scalars(stmt).first()
 
-def create_user(db, user):
-    new_user = User(**user.model_dump())
+def create_user(db, data, password_hash):
+    new_user = User(
+        name=data.name,
+        email=data.email,
+        password_hash = password_hash
+    )
     db.add(new_user)
     try:
         db.commit()

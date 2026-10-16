@@ -1,4 +1,5 @@
 from app.repositories import user_repository
+from app.core.security import hash_password
 
 class UserAlreadyExistsError(Exception):
     pass
@@ -16,12 +17,23 @@ async def get_spec_user(db, user_id:int):
         raise UserNotFoundError("User Not found")
     return user
 
-async def create_user(db, user):
+async def create_user(db, data, password_hash):
     try:
-        return user_repository.create_user(db, user)
+        return user_repository.create_user(db, data, password_hash)
 
     except user_repository.DuplicateEmailError:
         raise UserAlreadyExistsError()
+
+
+async def register_user(db, data):
+    hashed_password = hash_password(data.password)
+
+    return user_repository.create_user(
+        db,
+        data,
+        password_hash = hashed_password
+    )
+
 
 async def update_user(db, user_id, data):
     try:

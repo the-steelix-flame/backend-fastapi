@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from app.services import user_service
 from app.dependencies import get_db
-from app.schemas.user import UserCreate, UserResponse, UserUpdate
+from app.schemas.user import UserRegister, UserResponse, UserUpdate
 
 router = APIRouter(
             prefix="/users",
@@ -25,9 +25,9 @@ async def get_spec_user(user_id: int, db = Depends(get_db)):
         )
 
 @router.post('/', status_code=201, response_model=UserResponse)
-async def create_spec_user(user:UserCreate, db = Depends(get_db)):
+async def register_user(user:UserRegister, db = Depends(get_db)):
     try:
-        return await user_service.create_user(db, user)
+        return await user_service.register_user(db, user)
 
     except user_service.UserAlreadyExistsError:
         raise HTTPException(
