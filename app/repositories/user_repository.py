@@ -59,3 +59,7 @@ def delete_user(db, user_id):
 
     db.delete(user)
     db.commit()
+
+def get_user_by_email(db, email: str):
+    stmt = select(User).where(User.email == email)
+    return db.scalars(stmt).first()

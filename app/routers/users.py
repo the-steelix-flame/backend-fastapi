@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from app.services import user_service
 from app.dependencies import get_db
-from app.schemas.user import UserRegister, UserResponse, UserUpdate
+from app.schemas.user import UserRegister, UserResponse, UserUpdate, UserLogin
 
 router = APIRouter(
             prefix="/users",
@@ -65,4 +65,14 @@ async def delete_user(user_id: int, db=Depends(get_db)):
         raise HTTPException(
             status_code=404,
             detail="User not found"
+        )
+
+@router.post('/login', response_model=UserResponse)
+async def login(user:UserLogin, db = Depends(get_db)):
+    try:
+        return await user_service.authenticate_user(db, user)
+    except user_service.InvalidCredentialsError:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid credentials"
         )

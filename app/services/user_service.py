@@ -1,11 +1,12 @@
 from app.repositories import user_repository
-from app.core.security import hash_password
+from app.core.security import hash_password, verify_password
 
 class UserAlreadyExistsError(Exception):
     pass
 class UserNotFoundError(Exception):
     pass
-
+class InvalidCredentialsError(Exception):
+    pass
 
 async def get_all_users(db):
     users = user_repository.get_all(db)
@@ -17,22 +18,17 @@ async def get_spec_user(db, user_id:int):
         raise UserNotFoundError("User Not found")
     return user
 
-async def create_user(db, data, password_hash):
+async def register_user(db, data):
+    hashed_password = hash_password(data.password)
     try:
-        return user_repository.create_user(db, data, password_hash)
+        return user_repository.create_user(
+            db,
+            data,
+            password_hash = hashed_password
+        )
 
     except user_repository.DuplicateEmailError:
         raise UserAlreadyExistsError()
-
-
-async def register_user(db, data):
-    hashed_password = hash_password(data.password)
-
-    return user_repository.create_user(
-        db,
-        data,
-        password_hash = hashed_password
-    )
 
 
 async def update_user(db, user_id, data):
@@ -52,3 +48,20 @@ async def delete_user(db, user_id):
         return user_repository.delete_user(db, user_id)
     except user_repository.UserNotFoundError:
         raise UserNotFoundError()
+
+async def authenticate_user(db, data):
+    user = user_repository.get_user_by_email(
+        db,
+        data.email
+    )
+
+    if user is None:
+        raise InvalidCredentialsError()
+
+    if not verify_password(
+        data.password,
+        user.password_hash
+    ):
+        raise InvalidCredentialsError()
+
+    return user
