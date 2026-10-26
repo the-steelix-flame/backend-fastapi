@@ -1,5 +1,5 @@
 from app.repositories import user_repository
-from app.core.security import hash_password, verify_password
+from app.core.security import hash_password, verify_password, create_access_token
 
 class UserAlreadyExistsError(Exception):
     pass
@@ -7,6 +7,8 @@ class UserNotFoundError(Exception):
     pass
 class InvalidCredentialsError(Exception):
     pass
+
+
 
 async def get_all_users(db):
     users = user_repository.get_all(db)
@@ -63,5 +65,11 @@ async def authenticate_user(db, data):
         user.password_hash
     ):
         raise InvalidCredentialsError()
+    
+    token = create_access_token({"sub": str(user.id)})
 
-    return user
+
+    return {
+        "access_token": token,
+        "token_type": "bearer"
+    }

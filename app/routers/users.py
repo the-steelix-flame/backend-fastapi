@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from app.services import user_service
 from app.dependencies import get_db
-from app.schemas.user import UserRegister, UserResponse, UserUpdate, UserLogin
+from app.schemas.user import UserRegister, UserResponse, UserUpdate, UserLogin, Token
 
 router = APIRouter(
             prefix="/users",
@@ -67,7 +67,7 @@ async def delete_user(user_id: int, db=Depends(get_db)):
             detail="User not found"
         )
 
-@router.post('/login', response_model=UserResponse)
+@router.post('/login', response_model=Token)
 async def login(user:UserLogin, db = Depends(get_db)):
     try:
         return await user_service.authenticate_user(db, user)
